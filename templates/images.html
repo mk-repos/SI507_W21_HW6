@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <h1>
+        Hello, {{name}}!
+    </h1>
+    <p>Today's technology headlines are...</p>
+    <table border="1">
+        <tr>
+            <th>Title</th>
+            <th>Thumbnail</th>
+        </tr>
+        {% for article in articles %}
+        <tr>
+            <td><a href={{article['url']}}>{{article['title']}}</a></td>
+            <td><img src={{article['thumbnail']}} width="300"></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+
+</html>

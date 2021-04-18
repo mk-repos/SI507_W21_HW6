@@ -32,8 +32,21 @@ def make_request(baseurl: str, params: dict):
     return response.json()
 
 
-# flask app -------------------------------------------------------------------
+def get_nyt_articles():
+    """Get technology headlines from NYT
 
+    Returns
+    -------
+    list
+        list of resulting dictionaries of each article
+    """
+    baseurl = "https://api.nytimes.com/svc/topstories/v2/technology.json"
+    params = {"api-key": API_KEY}
+    response = make_request(baseurl, params)
+    return response["results"]
+
+
+# flask app -------------------------------------------------------------------
 app = Flask(__name__)
 
 
@@ -50,16 +63,39 @@ def hello_name(nm):
 @app.route('/headlines/<nm>')
 def headlines(nm):
     # API call
-    baseurl = "https://api.nytimes.com/svc/topstories/v2/technology.json"
-    params = {"api-key": API_KEY}
-    response = make_request(baseurl, params)
-    response = response["results"]
+    response = get_nyt_articles()
     # extract titles
     headlines = []
     for article in response[:5]:
         headlines.append(article['title'])
 
     return render_template("headlines.html", name=nm, headlines=headlines)
+
+
+@app.route('/links/<nm>')
+def links(nm):
+    # API call
+    response = get_nyt_articles()
+    # extract titles and links
+    hyperlinks = {}
+    for article in response[:5]:
+        hyperlinks[article['title']] = article['url']
+
+    return render_template("links.html", name=nm, hyperlinks=hyperlinks)
+
+
+@app.route('/images/<nm>')
+def images(nm):
+    # API call
+    response = get_nyt_articles()
+    # extract titles, links, thumbnails
+    articles = []
+    for article in response[:5]:
+        articles.append({"title": article['title'],
+                         "url": article['url'],
+                         "thumbnail": article['multimedia'][0]['url']})
+
+    return render_template("images.html", name=nm, articles=articles)
 
 
 if __name__ == '__main__':
